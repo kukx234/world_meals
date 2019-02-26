@@ -9,15 +9,12 @@ class Ingredient extends Model
 {
     use Translatable;
 
-    public $translatedAttributes = ['title'];
+    public $translatedAttributes = ['title','slug'];
 
     protected $fillable = ['title','slug'];
 
-    public function meal(){
-
+    public function meal()
+    {
         return $this->belongsToMany('App\Models\Meal');
-
-        //return $this->belongsTo('App\Models\Meal');
-
     }
 }

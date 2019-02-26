@@ -6,6 +6,7 @@ $factory->define(App\Models\Tag::class, function (Faker $faker) {
     return [
         'title:en' => $faker->word,
         'title:hr' => $faker->word,
-        'slug' => $faker->slug,
+        'slug:en' => $faker->slug,
+        'slug:hr' => $faker->slug,
     ];
 });

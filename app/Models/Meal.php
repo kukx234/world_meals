@@ -12,29 +12,40 @@ class Meal extends Model
 
     protected $fillable = ['title','description','category_id','status'];
 
-    public function category(){
-
+    public function category()
+    {
         return $this->belongsTo('App\Models\Category');
     }
 
-    public function ingredient(){
-
-        //return $this->hasMany('App\Models\Ingredient','meals_id');
-
+    public function ingredient()
+    {
         return $this->belongsToMany('App\Models\Ingredient');
     }
 
-    public function tag(){
-
-        //return $this->hasMany('App\Models\Tag','meals_id');
-
+    public function tag()
+    {
         return $this->belongsToMany('App\Models\Tag');
     }
 
-    public function language(){
-
-        //return $this->belongsTo('App\Models\Language');
-
+    public function language()
+    {
         return $this->belongsToMany('App\Models\Language');
     }
+
+    public function scopeOfCategory($query,$category = null)
+    {
+        if($category){
+            if($category === "null") {
+                return $query->whereNull('category_id');
+            }
+            else if($category === "!null") {
+                return  $query->whereNotNull('category_id');
+            }
+            else {
+                return $query->where('category_id',$category);
+            }
+        }
+        return $query;
+    }
+    
 }

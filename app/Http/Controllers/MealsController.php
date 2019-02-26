@@ -5,98 +5,47 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Meal;
 use Illuminate\Support\Facades\Input;
+use App\Http\Resources\Meal as MealResource;
+use App\Http\Resources\MealCollection;
+use App\Http\Requests\MealRequest;
 
 class MealsController extends Controller
 {
-    public function index(Request $request){
+    public function index(MealRequest $request)
+    {
 
-    $tag_id = $request->get('tag');
-    if($tag_id){
-        $tag_id = explode(',',$tag_id);
-    }
+        $tagId = $request->get('tag');
+        if ($tagId) {
+            $tagId = explode(',', $tagId);
+        }
 
-    $lang = $request->get('lang');
-   
-    $with = $request->get('with', []);
-    if(!empty($with)){
-        $with = explode(',',$with);
-    }
+        $lang = $request->get('lang');
 
-    $category = $request->get('category');
+        $with = $request->get('with', []);
+        if (!empty($with)) {
+            $with = explode(',', $with);
+        }
 
-    $per_page = $request->get('per_page', 10);
+        $category = $request->get('category');
 
- 
-            $meals = Meal::when(!empty($with),function($query)use($with){
-                $query->with($with);
-            })->when($category !== null , function($query) use($category){
-                if($category === "null"){
-                    $query->whereNull('category_id');
-                }
-                else if($category === "!null"){
-                    $query->whereNotNull('category_id');
-                }
-                else{
-                    $query->where('category_id',$category);
-                }
-            })->whereHas('tag',function($query)use($tag_id){
-
-                if(!empty($tag_id)){
-                    $query->whereIn('id',$tag_id);
-                }
-            })->paginate($per_page);
+        $perPage = $request->get('per_page', 10);
 
 
-            
-            $results = [];
-
-            foreach ($meals->items() as $meal) {
-                
-                $result = array_merge(['status'=> $meal->status,$meal->translate($lang)]);
-
-
-
-                if (in_array('tag', $with)) {
-                    $tags = [];
-                    foreach ($meal->tag as $tag) {
-
-                        $tags[] = array_merge([ 'slug' => $tag->slug, $tag->translate($lang) ]);
-                    }
-                    $result['tags'] = $tags ;
-                }
-
-
-
-                if (in_array('ingredient', $with)) {
-                    $ingredients = [];
-                    foreach ($meal->ingredient as $ingredient) {
-
-                        $ingredients[] = array_merge([ 'slug' => $ingredient->slug, $ingredient->translate($lang) ]);
-                    }
-                    $result['ingredients'] = $ingredients ;
-                }
-
-               
-
-
-                if (in_array('category', $with) && $meal->category) {
-
-                    $result['category'] = array_merge([ 'slug' => $meal->category->slug, $meal->category->translate($lang) ]);
-                }
-
-
-                $results[] = $result;
+        $meals = Meal::when(!empty($with), function($query) use ($with)
+        {
+            $query->with($with); 
+        })
+        ->ofCategory($category)
+        ->whereHas('tag', function($query) use ($tagId)
+        {
+            if (!empty($tagId)) {
+                $query->whereIn('id',$tagId);
             }
+        })
+        ->paginate($perPage);
 
-       return [ 
-           'meta'=> [
-              'currentPage' => $meals->currentPage(),
-              'totalItems' => $meals->total(),
-              'itemsPerPage' => $meals->perPage(),
-              'totalPages' => $meals->lastPage(),
-           ],
-           'data' => $results
-        ];
+        return  new MealCollection($meals);
+      
     }
 
     

@@ -6,7 +6,7 @@ $factory->define(App\Models\Category::class, function (Faker $faker) {
     return [
         'title:en' => $faker->name,
         'title:hr' => $faker->name,
-        'slug' => $faker->slug,
-        
+        'slug:en' => $faker->slug,
+        'slug:hr' => $faker->slug,
     ];
 });

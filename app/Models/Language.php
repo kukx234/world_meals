@@ -8,10 +8,8 @@ class Language extends Model
 {
     public $timestamps = false;
     
-    public function meal(){
-
-        //return $this->hasMany('App\Models\Meal');
-
+    public function meal()
+    {
         return $this->belongsToMany('App\Models\Meal');
     }
 }

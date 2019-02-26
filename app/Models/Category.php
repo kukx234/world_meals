@@ -7,15 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
-
     use Translatable;
 
-    public $translatedAttributes = ['title'];
+    public $translatedAttributes = ['title','slug'];
 
     protected $fillable = ['title','slug'];
 
-    public function meal(){
-
+    public function meal()
+    {
         return $this->hasMany('App\Models\Meal');
     }
 }
