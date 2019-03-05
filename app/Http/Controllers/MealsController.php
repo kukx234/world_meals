@@ -19,8 +19,6 @@ class MealsController extends Controller
             $tagId = explode(',', $tagId);
         }
 
-        $lang = $request->get('lang');
-
         $with = $request->get('with', []);
         if (!empty($with)) {
             $with = explode(',', $with);
@@ -33,7 +31,7 @@ class MealsController extends Controller
 
         $meals = Meal::when(!empty($with), function($query) use ($with)
         {
-            $query->with($with); 
+            $query->with($with);
         })
         ->ofCategory($category)
         ->whereHas('tag', function($query) use ($tagId)
@@ -45,8 +43,9 @@ class MealsController extends Controller
         ->paginate($perPage);
 
         return  new MealCollection($meals);
-      
+
+
     }
 
-    
+
 }
