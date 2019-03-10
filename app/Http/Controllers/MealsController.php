@@ -2,11 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Meal;
-use Illuminate\Support\Facades\Input;
-use App\Http\Resources\Meal as MealResource;
-use App\Http\Resources\MealCollection;
+use App\Classes\Filter;
 use App\Http\Requests\MealRequest;
 
 class MealsController extends Controller
@@ -15,35 +11,16 @@ class MealsController extends Controller
     {
 
         $tagId = $request->get('tag');
-        if ($tagId) {
-            $tagId = explode(',', $tagId);
-        }
-
-        $with = $request->get('with', []);
-        if (!empty($with)) {
-            $with = explode(',', $with);
-        }
-
+        
+        $with = $request->get('with');
+        
         $category = $request->get('category');
 
         $perPage = $request->get('per_page', 10);
 
+        $filter = new Filter($tagId,$category,$with,$perPage);
 
-        $meals = Meal::when(!empty($with), function($query) use ($with)
-        {
-            $query->with($with);
-        })
-        ->ofCategory($category)
-        ->whereHas('tag', function($query) use ($tagId)
-        {
-            if (!empty($tagId)) {
-                $query->whereIn('id',$tagId);
-            }
-        })
-        ->paginate($perPage);
-
-        return  new MealCollection($meals);
-
+        return $filter->filterMeals();
 
     }
 
